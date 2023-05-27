@@ -140,6 +140,8 @@ class login(APIView):
             jwt_json['exp'] = exp_time
             session_jwt = self.jwt.m_encode(json=jwt_json,secret=email)
 
+            self.dao_t_users.update_token(dto_user.id, session_jwt)
+
             response['status'] = "OK"
             response["token"]   = session_jwt
 

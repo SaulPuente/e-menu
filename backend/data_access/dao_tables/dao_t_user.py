@@ -122,9 +122,9 @@ class DAO_T_Users(object):
         if db_conn.open: self.db_handler.disconnect(db_conn)
         return str(result[0])
     #...........................................................................
-    def update_token(self, id: int, password: str) -> bool:
+    def update_token(self, id: int, token: str) -> bool:
         db_conn = self.db_handler.connect()
-        query = dictionary_t_user['update_token']%(password,id)
+        query = dictionary_t_user['update_token']%(token,id)
         with db_conn as connection:
             with connection.cursor() as cursor:
                 cursor.execute(query)
