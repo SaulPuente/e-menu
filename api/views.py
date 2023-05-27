@@ -11,6 +11,7 @@ import os
 
 from backend.data_access.dao_tables.dao_t_test import DAO_T_Test
 from backend.data_access.dao_tables.dao_t_user import DAO_T_Users
+from backend.data_access.dao_tables.dao_t_recipe import DAO_T_Recipes
 from backend.logics.mysql_conn.lib_db_connector import Threading_DB_Connection
 from backend.logics.jwt.lib_jwt import JWT_Lib
 
@@ -144,6 +145,296 @@ class login(APIView):
 
             response['status'] = "OK"
             response["token"]   = session_jwt
+
+            return Response(response, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class newRecipe(APIView):
+    permission_classes = (AllowAny,)
+
+    def __init__(self):
+        # self.json_builder     = Json_Builder()
+        # self.jwt              = JWT_Lib()
+        self.db_handler         = Threading_DB_Connection(dbconfig)
+        self.dao_t_users        = DAO_T_Users(self.db_handler)
+        self.dao_t_recipes      = DAO_T_Recipes(self.db_handler)
+        self.jwt                = JWT_Lib()
+    
+    def post(self, request):
+        try:
+            data        = request.data
+
+            response = dict()
+            
+            email = data.get("email", "").strip()
+            token = data.get("token", "").strip()
+
+            name = data.get("name", "").strip()
+            description = data.get("description", "").strip()
+            image = data.get("image", "").strip()
+            ingredients = data.get("ingredients", "")
+            steps = data.get("steps", "")
+
+            if not email or not name or not description or not image or not ingredients or not steps:
+                response["status"] = "MISSING DATA"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            dto_user = self.dao_t_users.select_by_email(email)
+
+            if not dto_user:
+                response["status"] = "USER NOT FOUND"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            if token != dto_user.token:
+                response["status"] = "WRONG TOKEN"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            
+            info = {
+                "ingredients": ingredients,
+                "steps": steps
+            }
+
+            recipe_id = self.dao_t_recipes.insert_new(name, description, image, info)
+
+            response['status'] = "OK"
+            response["id"]   = recipe_id
+
+            return Response(response, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class recipes(APIView):
+    permission_classes = (AllowAny,)
+
+    def __init__(self):
+        # self.json_builder     = Json_Builder()
+        # self.jwt              = JWT_Lib()
+        self.db_handler         = Threading_DB_Connection(dbconfig)
+        self.dao_t_users        = DAO_T_Users(self.db_handler)
+        self.dao_t_recipes      = DAO_T_Recipes(self.db_handler)
+        self.jwt                = JWT_Lib()
+    
+    def post(self, request):
+        try:
+            data        = request.data
+
+            response = dict()
+            
+            email = data.get("email", "").strip()
+            token = data.get("token", "").strip()
+
+            if not email or not recipe or not token:
+                response["status"] = "MISSING DATA"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            dto_user = self.dao_t_users.select_by_email(email)
+            
+            if not dto_user:
+                response["status"] = "USER NOT FOUND"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            if token != dto_user.token:
+                response["status"] = "WRONG DATA"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            
+            dto_recipes = self.dao_t_recipes.select_all()
+
+            recipes_list = list()
+
+            for dto_recipe in dto_recipes:
+                recipe_dict = dict()
+
+                recipe_dict["id"] = dto_recipe.id
+                recipe_dict["name"] = dto_recipe.name
+                recipe_dict["description"] = dto_recipe.description
+                recipe_dict["image"] = dto_recipe.image
+                recipe_dict["ingredients"] = dto_recipe.ingredients
+                recipe_dict["steps"] = dto_recipe.steps
+
+                recipes_list.append(recipe_dict)
+
+            response['status'] = "OK"
+            response["recipes"]   = recipes_list
+
+            return Response(response, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class recipe(APIView):
+    permission_classes = (AllowAny,)
+
+    def __init__(self):
+        # self.json_builder     = Json_Builder()
+        # self.jwt              = JWT_Lib()
+        self.db_handler         = Threading_DB_Connection(dbconfig)
+        self.dao_t_users        = DAO_T_Users(self.db_handler)
+        self.dao_t_recipes      = DAO_T_Recipes(self.db_handler)
+        self.jwt                = JWT_Lib()
+    
+    def post(self, request):
+        try:
+            data        = request.data
+
+            response = dict()
+            
+            email = data.get("email", "").strip()
+            token = data.get("token", "").strip()
+            recipe = data.get("recipe", 0)
+
+            if not email or not recipe or not token:
+                response["status"] = "MISSING DATA"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            dto_user = self.dao_t_users.select_by_email(email)
+            
+            if not dto_user:
+                response["status"] = "USER NOT FOUND"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            if token != dto_user.token:
+                response["status"] = "WRONG TOKEN"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            
+            dto_recipe = self.dao_t_recipes.select_by_id(recipe)
+
+            if not dto_recipe:
+                response["status"] = "RECIPE NOT FOUND"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            recipe_dict = dict()
+
+            recipe_dict["id"] = dto_recipe.id
+            recipe_dict["name"] = dto_recipe.name
+            recipe_dict["description"] = dto_recipe.description
+            recipe_dict["image"] = dto_recipe.image
+            recipe_dict["ingredients"] = dto_recipe.ingredients
+            recipe_dict["steps"] = dto_recipe.steps
+
+            response['status'] = "OK"
+            response["recipe"]  = recipe_dict
+
+            return Response(response, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class updateRecipe(APIView):
+    permission_classes = (AllowAny,)
+
+    def __init__(self):
+        # self.json_builder     = Json_Builder()
+        # self.jwt              = JWT_Lib()
+        self.db_handler         = Threading_DB_Connection(dbconfig)
+        self.dao_t_users        = DAO_T_Users(self.db_handler)
+        self.dao_t_recipes      = DAO_T_Recipes(self.db_handler)
+        self.jwt                = JWT_Lib()
+    
+    def post(self, request):
+        try:
+            data        = request.data
+
+            response = dict()
+            
+            email = data.get("email", "").strip()
+            token = data.get("token", "").strip()
+
+            recipe = data.get("recipe", 0)
+
+            if not email or not recipe or not token:
+                response["status"] = "MISSING DATA"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            dto_user = self.dao_t_users.select_by_email(email)
+            
+            if not dto_user:
+                response["status"] = "USER NOT FOUND"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            if token != dto_user.token:
+                response["status"] = "WRONG TOKEN"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            
+            dto_recipe = self.dao_t_recipes.select_by_id(recipe)
+
+            if not dto_recipe:
+                response["status"] = "RECIPE NOT FOUND"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            
+            name = data.get("name", dto_recipe.name).strip()
+            description = data.get("description", dto_recipe.description).strip()
+            image = data.get("image", dto_recipe.image).strip()
+            ingredients = data.get("ingredients", dto_recipe.ingredients)
+            steps = data.get("steps", dto_recipe.steps)
+
+            info = {
+                "ingredients": ingredients,
+                "steps": steps
+            }
+
+            self.dao_t_recipes.update_by_id(dto_recipe.id, name, description, image, info)            
+
+            response['status'] = "OK"
+
+            return Response(response, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class deleteRecipe(APIView):
+    permission_classes = (AllowAny,)
+
+    def __init__(self):
+        # self.json_builder     = Json_Builder()
+        # self.jwt              = JWT_Lib()
+        self.db_handler         = Threading_DB_Connection(dbconfig)
+        self.dao_t_users        = DAO_T_Users(self.db_handler)
+        self.dao_t_recipes      = DAO_T_Recipes(self.db_handler)
+        self.jwt                = JWT_Lib()
+    
+    def post(self, request):
+        try:
+            data        = request.data
+
+            response = dict()
+            
+            email = data.get("email", "").strip()
+            token = data.get("token", "").strip()
+
+            recipe = data.get("recipe", 0)
+
+            if not email or not recipe or not token:
+                response["status"] = "MISSING DATA"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            dto_user = self.dao_t_users.select_by_email(email)
+
+            if not dto_user:
+                response["status"] = "USER NOT FOUND"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            if token != dto_user.token:
+                response["status"] = "WRONG TOKEN"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            
+            dto_recipe = self.dao_t_recipes.select_by_id(recipe)
+
+            if not dto_recipe:
+                response["status"] = "RECIPE NOT FOUND"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            self.dao_t_recipes.delete_by_id(dto_recipe.id)            
+
+            response['status'] = "OK"
 
             return Response(response, status=status.HTTP_200_OK)
 
