@@ -10,7 +10,11 @@ from django.http import HttpResponse
 import os
 
 from backend.data_access.dao_tables.dao_t_test import DAO_T_Test
+from backend.data_access.dao_tables.dao_t_user import DAO_T_Users
 from backend.logics.mysql_conn.lib_db_connector import Threading_DB_Connection
+from backend.logics.jwt.lib_jwt import JWT_Lib
+
+import time
 
 
 dbconfig = {
@@ -51,6 +55,93 @@ class test(APIView):
                 test_list.append(test_dict)
             response = dict()
             response['list'] = test_list
+
+            return Response(response, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class register(APIView):
+    permission_classes = (AllowAny,)
+
+    def __init__(self):
+        # self.json_builder     = Json_Builder()
+        # self.jwt              = JWT_Lib()
+        self.db_handler         = Threading_DB_Connection(dbconfig)
+        self.dao_t_users        = DAO_T_Users(self.db_handler)
+        self.jwt                = JWT_Lib()
+    
+    def post(self, request):
+        try:
+            data        = request.data
+
+            response = dict()
+            
+            email = data.get("email", "").strip()
+            fname = data.get("fname", "").strip()
+            lname = data.get("lname", "").strip()
+            password = data.get("password", "").strip()
+
+            if not email or not fname or not lname or not password:
+                response["status"] = "WRONG"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            now_time    = int(time.time())
+            exp_time    = now_time + int(1000)
+            jwt_json    = {}
+            jwt_json['exp'] = exp_time
+            session_jwt = self.jwt.m_encode(json=jwt_json,secret=email)
+
+            user_id = self.dao_t_users.insert_new_user(email, fname, lname, password, "active", session_jwt)
+            
+            response['status'] = "OK"
+            response["id"] = user_id
+            response["token"]   = session_jwt
+
+            return Response(response, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class login(APIView):
+    permission_classes = (AllowAny,)
+
+    def __init__(self):
+        # self.json_builder     = Json_Builder()
+        # self.jwt              = JWT_Lib()
+        self.db_handler         = Threading_DB_Connection(dbconfig)
+        self.dao_t_users        = DAO_T_Users(self.db_handler)
+        self.jwt                = JWT_Lib()
+    
+    def post(self, request):
+        try:
+            data        = request.data
+
+            response = dict()
+            
+            email = data.get("email", "").strip()
+            password = data.get("password", "").strip()
+
+            if not email or not password:
+                response["status"] = "WRONG"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            dto_user = self.dao_t_users.select_by_email(email)
+
+            if password != dto_user.password:
+                response["status"] = "WRONG"
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            
+            now_time    = int(time.time())
+            exp_time    = now_time + int(1000)
+            jwt_json    = {}
+            jwt_json['exp'] = exp_time
+            session_jwt = self.jwt.m_encode(json=jwt_json,secret=email)
+
+            response['status'] = "OK"
+            response["token"]   = session_jwt
 
             return Response(response, status=status.HTTP_200_OK)
 
