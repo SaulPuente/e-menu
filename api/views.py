@@ -35,29 +35,6 @@ class test(APIView):
         self.db_handler       = Threading_DB_Connection(dbconfig)
         self.dao_t_test         = DAO_T_Test(self.db_handler)
     
-    def get(self, request):
-        try:
-            data        = request.data
-            
-            dto_tests = self.dao_t_test.select_all()
-
-            test_list = list()
-
-            for dto_test in dto_tests:
-                test_dict = dict()
-                test_dict["id"] = dto_test.id
-                test_dict["name"] = dto_test.name
-                test_dict["description"] = dto_test.description
-                test_list.append(test_dict)
-            response = dict()
-            response['list'] = test_list
-
-            return Response(response, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            print(e)
-            return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
     def post(self, request):
         try:
             data        = request.data
