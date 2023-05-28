@@ -177,8 +177,11 @@ class newRecipe(APIView):
             image = data.get("image", "").strip()
             ingredients = data.get("ingredients", "")
             steps = data.get("steps", "")
+            price = data.get("price", "")
+            location = data.get("location", "")
+            place_name = data.get("place_name", "")
 
-            if not email or not name or not description or not image or not ingredients or not steps:
+            if not email or not name or not description or not image or not ingredients or not steps or not price or not location or not place_name:
                 response["status"] = "MISSING DATA"
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
@@ -197,7 +200,7 @@ class newRecipe(APIView):
                 "steps": steps
             }
 
-            recipe_id = self.dao_t_recipes.insert_new(name, description, image, info)
+            recipe_id = self.dao_t_recipes.insert_new(name, description, image, info, price, location, place_name)
 
             response['status'] = "OK"
             response["id"]   = recipe_id
@@ -255,6 +258,9 @@ class recipes(APIView):
                 recipe_dict["image"] = dto_recipe.image
                 recipe_dict["ingredients"] = dto_recipe.ingredients
                 recipe_dict["steps"] = dto_recipe.steps
+                recipe_dict["price"] = dto_recipe.price
+                recipe_dict["location"] = dto_recipe.location
+                recipe_dict["place_name"] = dto_recipe.place_name
 
                 recipes_list.append(recipe_dict)
 
@@ -316,6 +322,9 @@ class recipe(APIView):
             recipe_dict["image"] = dto_recipe.image
             recipe_dict["ingredients"] = dto_recipe.ingredients
             recipe_dict["steps"] = dto_recipe.steps
+            recipe_dict["price"] = dto_recipe.price
+            recipe_dict["location"] = dto_recipe.location
+            recipe_dict["place_name"] = dto_recipe.place_name
 
             response['status'] = "OK"
             response["recipe"]  = recipe_dict
@@ -374,13 +383,16 @@ class updateRecipe(APIView):
             image = data.get("image", dto_recipe.image).strip()
             ingredients = data.get("ingredients", dto_recipe.ingredients)
             steps = data.get("steps", dto_recipe.steps)
+            price = data.get("price", dto_recipe.price)
+            location = data.get("location", dto_recipe.location)
+            place_name = data.get("place_name", dto_recipe.place_name)
 
             info = {
                 "ingredients": ingredients,
                 "steps": steps
             }
 
-            self.dao_t_recipes.update_by_id(dto_recipe.id, name, description, image, info)            
+            self.dao_t_recipes.update_by_id(dto_recipe.id, name, description, image, info, price, location, place_name)            
 
             response['status'] = "OK"
 

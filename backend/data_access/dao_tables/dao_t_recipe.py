@@ -25,7 +25,7 @@ class DAO_T_Recipes(object):
         recipes_list = []
         for result in results:
             result = list(result)
-            recipes_list.append(DTO_Recipe(int(result[0]), str(result[1]), str(result[2]), str(result[3]), json.loads(str(result[4]))))
+            recipes_list.append(DTO_Recipe(int(result[0]), str(result[1]), str(result[2]), str(result[3]), json.loads(str(result[4])), str(result[5]), str(result[6]), str(result[7])))
         if db_conn.open: self.db_handler.disconnect(db_conn)
         return recipes_list
     #...........................................................................
@@ -38,13 +38,13 @@ class DAO_T_Recipes(object):
                 result = cursor.fetchone()
         if not result: return DTO_Recipe()
         result = list(result)
-        user = DTO_Recipe(int(result[0]), str(result[1]), str(result[2]), str(result[3]), json.loads(str(result[4])))
+        user = DTO_Recipe(int(result[0]), str(result[1]), str(result[2]), str(result[3]), json.loads(str(result[4])), str(result[5]), str(result[6]), str(result[7]))
         if db_conn.open: self.db_handler.disconnect(db_conn)
         return user
     #...........................................................................
-    def insert_new(self, name: str="-", description: str="-", image: str="-", info: dict={}) -> int:
+    def insert_new(self, name: str="-", description: str="-", image: str="-", info: dict={}, price: str="0.0", location: str="-", place_name: str="-") -> int:
         db_conn = self.db_handler.connect()
-        query = dictionary_t_recipes["insert_new"]%(name, description, image, json.dumps(info))
+        query = dictionary_t_recipes["insert_new"]%(name, description, image, json.dumps(info), price, location, place_name)
         with db_conn as connection:
             with connection.cursor() as cursor:
                 cursor.execute(query)
@@ -53,9 +53,9 @@ class DAO_T_Recipes(object):
         if db_conn.open: self.db_handler.disconnect(db_conn)
         return id
     #...........................................................................
-    def update_by_id(self, id: int, name: str="-", description: str="-", image: str="-", info: dict={}) -> bool:
+    def update_by_id(self, id: int, name: str="-", description: str="-", image: str="-", info: dict={}, price: str="0.0", location: str="-", place_name: str="-") -> bool:
         db_conn = self.db_handler.connect()
-        query = dictionary_t_recipes['update_by_id']%(name, description, image, json.dumps(info), id)
+        query = dictionary_t_recipes['update_by_id']%(name, description, image, json.dumps(info), price, location, place_name, id)
         with db_conn as connection:
             with connection.cursor() as cursor:
                 cursor.execute(query)
