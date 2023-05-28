@@ -181,7 +181,7 @@ class newRecipe(APIView):
             location = data.get("location", "")
             place_name = data.get("place_name", "")
 
-            if not email or not name or not description or not image or not ingredients or not steps or not price or not location or not place_name:
+            if not email or not name or not description or not image or not price or not location or not place_name:
                 response["status"] = "MISSING DATA"
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
