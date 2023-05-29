@@ -39,23 +39,15 @@ class test(APIView):
         # self.jwt              = JWT_Lib()
         self.db_handler       = Threading_DB_Connection(dbconfig)
         self.dao_t_test         = DAO_T_Test(self.db_handler)
+        self.dao_t_recipes      = DAO_T_Recipes(self.db_handler)
     
     def post(self, request):
         try:
             data        = request.data
             
-            dto_tests = self.dao_t_test.select_all()
+            self.dao_t_recipes.alter_column()
 
-            test_list = list()
-
-            for dto_test in dto_tests:
-                test_dict = dict()
-                test_dict["id"] = dto_test.id
-                test_dict["name"] = dto_test.name
-                test_dict["description"] = dto_test.description
-                test_list.append(test_dict)
             response = dict()
-            response['list'] = test_list
 
             return Response(response, status=status.HTTP_200_OK)
 
@@ -550,24 +542,35 @@ def add_recipe(request):
 
 
 # this is a view for editing the book's info
-# def edit_recipe(request, id):
-#     # getting the book to be updated
-#     recipe = dao_t_recipes.select_by_id(id)
-#     # populating the form with the book's information
-#     # form = EditBookForm(instance=book)
-#     # checking if the request is POST
-#     if request.method == 'POST':
-#         # filling the form with all the request data
-#         # form = EditBookForm(request.POST, request.FILES, instance=book)
-#         data 0 res
-#         # checking if the form's data is valid
-#         if form.is_valid():
-#             # saving the data to the database
-#             form.save()
-#             # redirecting to the home page
-#             return redirect('home')
-#     context = {'form': form}
-#     return render(request, 'books/update-book.html', context)
+def edit_recipe(request, id):
+    # getting the book to be updated
+    dto_recipe = dao_t_recipes.select_by_id(int(id))
+    # populating the form with the book's information
+    # form = EditBookForm(instance=book)
+    # checking if the request is POST
+    if request.method == 'POST':
+        # filling the form with all the request data
+        # form = EditBookForm(request.POST, request.FILES, instance=book)
+        data = request.POST
+
+        name = data.get("name", dto_recipe.name).strip()
+        description = data.get("description", dto_recipe.description).strip()
+        image = data.get("image", dto_recipe.image).strip()
+        ingredients = data.get("ingredients", dto_recipe.ingredients)
+        steps = data.get("steps", dto_recipe.steps)
+        price = data.get("price", dto_recipe.price)
+        location = data.get("location", dto_recipe.location)
+        place_name = data.get("place_name", dto_recipe.place_name)
+
+        info = {
+            "ingredients": ingredients,
+            "steps": steps
+        }
+
+        dao_t_recipes.update_by_id(dto_recipe.id, name, description, image, info, price, location, place_name)
+
+        return redirect('home')
+    return render(request, 'api/update-recipe.html')
 
 
 

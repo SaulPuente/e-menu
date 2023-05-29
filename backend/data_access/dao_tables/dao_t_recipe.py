@@ -73,4 +73,14 @@ class DAO_T_Recipes(object):
         if db_conn.open: self.db_handler.disconnect(db_conn)
         return True
     #...........................................................................
+    def alter_column(self) -> bool:
+        db_conn = self.db_handler.connect()
+        query = dictionary_t_recipes['alter_column']
+        with db_conn as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+        if db_conn.open: self.db_handler.disconnect(db_conn)
+        return True
+    #...........................................................................
 #-------------------------------------------------------------------------------

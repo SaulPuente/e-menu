@@ -13,7 +13,7 @@ urlpatterns = [
     # this is the add book url
     path('add-recipe/', views.add_recipe, name='add-recipe'),
     # this is the edit book url
-    # path('edit-recipe/<str:id>/', views.edit_recipe, name='edit-recipe'),
+    path('edit-recipe/<str:id>/', views.edit_recipe, name='edit-recipe'),
     # this is the delete book url
     path('delete-recipe/<str:id>/', views.delete_recipe, name='delete-recipe'),
     path("test/", views.test.as_view()),
