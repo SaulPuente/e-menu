@@ -486,7 +486,7 @@ def home(request):
 # this is a view for listing a single book
 def recipe_detail(request, id):
     # querying a particular book by its id
-    dto_recipe = dao_t_recipes.select_by_id(id)
+    dto_recipe = dao_t_recipes.select_by_id(int(id))
 
     recipe_dict = dict()
 
@@ -574,7 +574,7 @@ def add_recipe(request):
 # this is a view for deleting a book
 def delete_recipe(request, id):
     # getting the book to be deleted
-    dto_recipe = dao_t_recipes.select_by_id(id)
+    dto_recipe = dao_t_recipes.select_by_id(int(id))
 
     recipe_dict = dict()
 
@@ -591,7 +591,7 @@ def delete_recipe(request, id):
     if request.method == 'POST':
         # delete the book
         # recipe.delete()
-        dao_t_recipes.delete_by_id(id)
+        dao_t_recipes.delete_by_id(int(id))
         # return to home after a success delete
         return redirect('home')
     context = {'recipe': recipe_dict}
