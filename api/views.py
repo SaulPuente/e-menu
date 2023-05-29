@@ -181,19 +181,19 @@ class newRecipe(APIView):
             location = data.get("location", "")
             place_name = data.get("place_name", "")
 
-            if not email or not name or not description or not image or not price or not location or not place_name:
+            if not name or not description or not image or not price or not location or not place_name:
                 response["status"] = "MISSING DATA"
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-            dto_user = self.dao_t_users.select_by_email(email)
+            # dto_user = self.dao_t_users.select_by_email(email)
 
-            if not dto_user:
-                response["status"] = "USER NOT FOUND"
-                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            # if not dto_user:
+            #     response["status"] = "USER NOT FOUND"
+            #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-            if token != dto_user.token:
-                response["status"] = "WRONG TOKEN"
-                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            # if token != dto_user.token:
+            #     response["status"] = "WRONG TOKEN"
+            #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
             
             info = {
                 "ingredients": ingredients,
@@ -231,19 +231,19 @@ class recipes(APIView):
             email = data.get("email", "").strip()
             token = data.get("token", "").strip()
 
-            if not email or not recipe or not token:
-                response["status"] = "MISSING DATA"
-                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            # if not email or not recipe or not token:
+            #     response["status"] = "MISSING DATA"
+            #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-            dto_user = self.dao_t_users.select_by_email(email)
+            # dto_user = self.dao_t_users.select_by_email(email)
             
-            if not dto_user:
-                response["status"] = "USER NOT FOUND"
-                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            # if not dto_user:
+            #     response["status"] = "USER NOT FOUND"
+            #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-            if token != dto_user.token:
-                response["status"] = "WRONG DATA"
-                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            # if token != dto_user.token:
+            #     response["status"] = "WRONG DATA"
+            #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
             
             dto_recipes = self.dao_t_recipes.select_all()
 
@@ -294,19 +294,19 @@ class recipe(APIView):
             token = data.get("token", "").strip()
             recipe = data.get("recipe", 0)
 
-            if not email or not recipe or not token:
+            if not recipe:# or not token:
                 response["status"] = "MISSING DATA"
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-            dto_user = self.dao_t_users.select_by_email(email)
+            # dto_user = self.dao_t_users.select_by_email(email)
             
-            if not dto_user:
-                response["status"] = "USER NOT FOUND"
-                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            # if not dto_user:
+            #     response["status"] = "USER NOT FOUND"
+            #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-            if token != dto_user.token:
-                response["status"] = "WRONG TOKEN"
-                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            # if token != dto_user.token:
+            #     response["status"] = "WRONG TOKEN"
+            #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
             
             dto_recipe = self.dao_t_recipes.select_by_id(recipe)
 
@@ -357,19 +357,19 @@ class updateRecipe(APIView):
 
             recipe = data.get("recipe", 0)
 
-            if not email or not recipe or not token:
+            if not recipe:# or not token:
                 response["status"] = "MISSING DATA"
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-            dto_user = self.dao_t_users.select_by_email(email)
+            # dto_user = self.dao_t_users.select_by_email(email)
             
-            if not dto_user:
-                response["status"] = "USER NOT FOUND"
-                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            # if not dto_user:
+            #     response["status"] = "USER NOT FOUND"
+            #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-            if token != dto_user.token:
-                response["status"] = "WRONG TOKEN"
-                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            # if token != dto_user.token:
+            #     response["status"] = "WRONG TOKEN"
+            #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
             
             dto_recipe = self.dao_t_recipes.select_by_id(recipe)
 
@@ -424,19 +424,19 @@ class deleteRecipe(APIView):
 
             recipe = data.get("recipe", 0)
 
-            if not email or not recipe or not token:
+            if not recipe:# or not token:
                 response["status"] = "MISSING DATA"
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-            dto_user = self.dao_t_users.select_by_email(email)
+            # dto_user = self.dao_t_users.select_by_email(email)
 
-            if not dto_user:
-                response["status"] = "USER NOT FOUND"
-                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            # if not dto_user:
+            #     response["status"] = "USER NOT FOUND"
+            #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-            if token != dto_user.token:
-                response["status"] = "WRONG TOKEN"
-                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            # if token != dto_user.token:
+            #     response["status"] = "WRONG TOKEN"
+            #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
             
             dto_recipe = self.dao_t_recipes.select_by_id(recipe)
 
