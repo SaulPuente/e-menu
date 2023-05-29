@@ -460,16 +460,48 @@ dao_t_recipes      = DAO_T_Recipes(db_handler)
 
 def home(request):
     # retrieving all the books from the database
-    recipes = dao_t_recipes.select_all()#[{"id": 1,"title":"idjodd", "image": {"url": "ijdojodoi"}}]#Book.objects.all()
-    context = {'recipes': recipes}
+    dto_recipes = dao_t_recipes.select_all()#[{"id": 1,"title":"idjodd", "image": {"url": "ijdojodoi"}}]#Book.objects.all()
+
+    recipes_list = list()
+
+    for dto_recipe in dto_recipes:
+        recipe_dict = dict()
+
+        recipe_dict["id"] = dto_recipe.id
+        recipe_dict["name"] = dto_recipe.name
+        recipe_dict["description"] = dto_recipe.description
+        recipe_dict["image"] = dto_recipe.image
+        recipe_dict["ingredients"] = dto_recipe.ingredients
+        recipe_dict["steps"] = dto_recipe.steps
+        recipe_dict["price"] = dto_recipe.price
+        recipe_dict["location"] = dto_recipe.location
+        recipe_dict["place_name"] = dto_recipe.place_name
+
+        recipes_list.append(recipe_dict)
+
+    context = {'recipes': recipes_list}
     return render(request, 'api/home.html', context)
 
 
 # this is a view for listing a single book
 def recipe_detail(request, id):
     # querying a particular book by its id
-    recipe = dao_t_recipes.select_by_id(id)#Book.objects.get(pk=id)
-    context = {'recipe': recipe}
+    dto_recipe = dao_t_recipes.select_by_id(id)
+
+    recipe_dict = dict()
+
+    recipe_dict["id"] = dto_recipe.id
+    recipe_dict["name"] = dto_recipe.name
+    recipe_dict["description"] = dto_recipe.description
+    recipe_dict["image"] = dto_recipe.image
+    recipe_dict["ingredients"] = dto_recipe.ingredients
+    recipe_dict["steps"] = dto_recipe.steps
+    recipe_dict["price"] = dto_recipe.price
+    recipe_dict["location"] = dto_recipe.location
+    recipe_dict["place_name"] = dto_recipe.place_name
+
+    context = {'recipe': recipe_dict}
+
     return render(request, 'api/recipe-detail.html', context)
 
 # this is a view for adding a book
@@ -542,7 +574,19 @@ def add_recipe(request):
 # this is a view for deleting a book
 def delete_recipe(request, id):
     # getting the book to be deleted
-    recipe = dao_t_recipes.select_by_id(id)#Book.objects.get(pk=id)
+    dto_recipe = dao_t_recipes.select_by_id(id)
+
+    recipe_dict = dict()
+
+    recipe_dict["id"] = dto_recipe.id
+    recipe_dict["name"] = dto_recipe.name
+    recipe_dict["description"] = dto_recipe.description
+    recipe_dict["image"] = dto_recipe.image
+    recipe_dict["ingredients"] = dto_recipe.ingredients
+    recipe_dict["steps"] = dto_recipe.steps
+    recipe_dict["price"] = dto_recipe.price
+    recipe_dict["location"] = dto_recipe.location
+    recipe_dict["place_name"] = dto_recipe.place_name
     # checking if the method is POST
     if request.method == 'POST':
         # delete the book
@@ -550,5 +594,5 @@ def delete_recipe(request, id):
         dao_t_recipes.delete_by_id(id)
         # return to home after a success delete
         return redirect('home')
-    context = {'recipe': recipe}
+    context = {'recipe': recipe_dict}
     return render(request, 'recipes/delete-recipe.html', context)
