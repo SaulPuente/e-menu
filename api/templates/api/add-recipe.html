@@ -1,0 +1,62 @@
+{% extends 'api/base.html' %}
+
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <a href="{% url 'home' %}" class="my-3 btn btn-dark btn-sm">Go Back</a>
+
+        <div class="card shadow-lg">
+
+            <div class="card-body">
+                <!-- the form for adding a book -->
+                <form method="POST" enctype="multipart/form-data" action="">
+
+                    <!-- this is for securing the form from malicious attacks -->
+                    {% csrf_token %}
+
+                    <!-- this is the label and input for the Title -->
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">Recipe Name</label>
+                        <input required type="text" name="name" class="form-control" placeholder="name">
+                    </div>
+
+                    <!-- this is the label and input for the Author -->
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">Descripcion</label>
+                        <input required type="text" name="description" class="form-control" placeholder="description">
+                    </div>
+
+        
+                    <!-- this is the label and input for the Price -->
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">Price</label>
+                        <input required type="number" name="price" class="form-control" placeholder="Price">
+                    </div>
+
+                    <!-- this is the label and input for the ISBN -->
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">Location</label>
+                        <input required type="text" name="location" class="form-control" placeholder="location">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">Place name</label>
+                        <input required type="text" name="place_name" class="form-control" placeholder="place_name">
+                    </div>
+    
+                    <!-- this is the label and input for the Image -->
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">Upload Image:</label>
+                        <input required type="text" name="image" class="form-control" placeholder="image">
+                    </div>
+    
+                    <!-- Submit button -->
+                    <button type="submit" class="btn btn-success btn-block mb-4">Submit</button>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 from wsgiref.simple_server import demo_app
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -453,3 +453,102 @@ class deleteRecipe(APIView):
         except Exception as e:
             print(e)
             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+db_handler         = Threading_DB_Connection(dbconfig)
+dao_t_users        = DAO_T_Users(db_handler)
+dao_t_recipes      = DAO_T_Recipes(db_handler)
+
+def home(request):
+    # retrieving all the books from the database
+    recipes = dao_t_recipes.select_all()#[{"id": 1,"title":"idjodd", "image": {"url": "ijdojodoi"}}]#Book.objects.all()
+    context = {'recipes': recipes}
+    return render(request, 'api/home.html', context)
+
+
+# this is a view for listing a single book
+def recipe_detail(request, id):
+    # querying a particular book by its id
+    recipe = dao_t_recipes.select_by_id(id)#Book.objects.get(pk=id)
+    context = {'recipe': recipe}
+    return render(request, 'api/recipe-detail.html', context)
+
+# this is a view for adding a book
+def add_recipe(request):
+    # checking if the method is POST
+    if request.method == 'POST':
+        # getting all the data from the POST request
+        data = request.POST
+        # getting the image
+        name = data.get("name", "").strip()
+        description = data.get("description", "").strip()
+        image = data.get("image", "").strip()
+        ingredients = data.get("ingredients", "")
+        steps = data.get("steps", "")
+        price = data.get("price", "")
+        location = data.get("location", "")
+        place_name = data.get("place_name", "")
+
+        # dto_user = self.dao_t_users.select_by_email(email)
+
+        # if not dto_user:
+        #     response["status"] = "USER NOT FOUND"
+        #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        # if token != dto_user.token:
+        #     response["status"] = "WRONG TOKEN"
+        #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        info = {
+            "ingredients": ingredients,
+            "steps": steps
+        }
+        # creating and saving the book
+        dao_t_recipes.insert_new(
+           name = name,
+           description = description,
+           image = image,
+           info = info,
+           price = price,
+           location = location,
+           place_name = place_name
+        )
+        # going to the home page
+        return redirect('home')
+    return render(request, 'api/add-recipe.html')
+
+
+# this is a view for editing the book's info
+# def edit_recipe(request, id):
+#     # getting the book to be updated
+#     recipe = dao_t_recipes.select_by_id(id)
+#     # populating the form with the book's information
+#     # form = EditBookForm(instance=book)
+#     # checking if the request is POST
+#     if request.method == 'POST':
+#         # filling the form with all the request data
+#         # form = EditBookForm(request.POST, request.FILES, instance=book)
+#         data 0 res
+#         # checking if the form's data is valid
+#         if form.is_valid():
+#             # saving the data to the database
+#             form.save()
+#             # redirecting to the home page
+#             return redirect('home')
+#     context = {'form': form}
+#     return render(request, 'books/update-book.html', context)
+
+
+
+# this is a view for deleting a book
+def delete_recipe(request, id):
+    # getting the book to be deleted
+    recipe = dao_t_recipes.select_by_id(id)#Book.objects.get(pk=id)
+    # checking if the method is POST
+    if request.method == 'POST':
+        # delete the book
+        # recipe.delete()
+        dao_t_recipes.delete_by_id(id)
+        # return to home after a success delete
+        return redirect('home')
+    context = {'recipe': recipe}
+    return render(request, 'recipes/delete-recipe.html', context)
