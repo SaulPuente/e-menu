@@ -562,6 +562,23 @@ def edit_recipe(request, id):
         location = data.get("location", dto_recipe.location)
         place_name = data.get("place_name", dto_recipe.place_name)
 
+        if name == "":
+            name = dto_recipe.name
+        if description == "":
+            description = dto_recipe.description
+        if image == "":
+            image = dto_recipe.image
+        if len(ingredients) == 0:
+            ingredients = dto_recipe.ingredients
+        if len(steps) == 0:
+            steps = dto_recipe.steps
+        if price == "":
+            price = dto_recipe.price
+        if location == "":
+            location = dto_recipe.location
+        if place_name == "":
+            place_name = dto_recipe.place_name
+
         info = {
             "ingredients": ingredients,
             "steps": steps
@@ -598,4 +615,4 @@ def delete_recipe(request, id):
         # return to home after a success delete
         return redirect('home')
     context = {'recipe': recipe_dict}
-    return render(request, 'recipes/delete-recipe.html', context)
+    return render(request, 'api/delete-recipe.html', context)
