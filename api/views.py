@@ -72,11 +72,11 @@ class register(APIView):
             response = dict()
             
             email = data.get("email", "").strip()
-            fname = data.get("fname", "").strip()
-            lname = data.get("lname", "").strip()
+            fname = data.get("fname", "Nombre").strip()
+            lname = data.get("lname", "Apellido").strip()
             password = data.get("password", "").strip()
 
-            if not email or not fname or not lname or not password:
+            if not email or not password:
                 response["status"] = "WRONG"
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
